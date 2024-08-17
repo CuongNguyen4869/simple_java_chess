@@ -25,6 +25,10 @@ public class GamePanel extends JPanel implements Runnable{
     public static final int BLACK = 1;
     int currentColor = WHITE;
 
+    // BOOLEANS
+    boolean canMove;
+    boolean validSquare;
+
     //PIECES
     public static ArrayList<Piece> pieces = new ArrayList<>();      //backup for reset position
     public static ArrayList<Piece> simPieces = new ArrayList<>();   //current position?
@@ -42,7 +46,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void launchGame() {
         gameThread = new Thread(this);
-        gameThread.start();
+        gameThread.start(); // calls run()
     }
     
     public void setPieces() {
@@ -62,7 +66,7 @@ public class GamePanel extends JPanel implements Runnable{
         pieces.add(new Bishop(WHITE, 2, 7));       
         pieces.add(new Bishop(WHITE, 5, 7));
         pieces.add(new Queen(WHITE, 3, 7));
-        pieces.add(new King(WHITE, 4, 7));      
+        pieces.add(new King(WHITE, 4, 4));      
         
         //BLACK
         pieces.add(new Pawn(BLACK, 0, 1));
@@ -111,24 +115,56 @@ public class GamePanel extends JPanel implements Runnable{
             }
         }
 
-        // MOUSE RELEASEED
+        // MOUSE RELEASED
         if (mouse.pressed == false) {
             if (activeP != null) {
-                activeP.updatePosition();
-                activeP = null;
+                if (validSquare) {
+                    copyPieces(simPieces, pieces);
+                    activeP.updatePosition();
+                    if (activeP.hittingP != null) {
+                        simPieces.remove(activeP.hittingP.getIndex());
+                    }
+                } else {
+                    copyPieces(simPieces, pieces);
+                    activeP.resetPosition();
+                }
+                activeP = null;                                
             }
         }
     }
 
     private void simulate() {
+        
+        canMove = false;
+        validSquare = false;
+
+        // Restore the removed piece during the simulation
+        copyPieces(simPieces, pieces);
+        
+        // Held piece, update position
         activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
         activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
         activeP.col = activeP.getCol(activeP.x);
         activeP.row = activeP.getRow(activeP.y);
 
+        // System.out.println("mouse.x " + mouse.x +
+        //                     " mouse.y " + mouse.y +
+        //                     " activeP.x " + activeP.x +
+        //                     " activeP.y " + activeP.y +
+        //                     " activeP.col " + activeP.col +
+        //                     " activeP.row " + activeP.row);  
+
+        if (activeP.canMove(activeP.col, activeP.row)) {
+            canMove = true;
+            validSquare = true;
+
+            // if (activeP.hittingP != null) {
+            //     simPieces.remove(activeP.hittingP.getIndex());
+            // }
+        }
     }
 
-    public void paintComponent(Graphics g) {
+    public void paintComponent(Graphics g) {    // is called by repaint()
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
@@ -142,17 +178,19 @@ public class GamePanel extends JPanel implements Runnable{
 
         // Chess panel to move into
         if (activeP != null) {
-            g2.setColor(Color.white);
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
-            g2.fillRect(activeP.col * Board.SQUARE_SIZE, activeP.row * Board.SQUARE_SIZE,
-                    Board.SQUARE_SIZE, Board.SQUARE_SIZE);
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-            activeP.draw(g2);
+            if (canMove) {
+                g2.setColor(Color.white);
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+                g2.fillRect(activeP.col * Board.SQUARE_SIZE, activeP.row * Board.SQUARE_SIZE,
+                        Board.SQUARE_SIZE, Board.SQUARE_SIZE);
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+                activeP.draw(g2);
+            }           
         }
     }
 
     @Override
-    public void run() {
+    public void run() {     // is called by thread start()
         double drawInterval = 1000000000/FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
@@ -164,7 +202,7 @@ public class GamePanel extends JPanel implements Runnable{
 
             if (delta >= 1) {
                 update();
-                repaint();
+                repaint();      // calls paintComponent()
                 delta--;
             }
         }

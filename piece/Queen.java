@@ -13,4 +13,17 @@ public class Queen extends Piece {
             image = getImage("/piece/b-queen");
         }
     }
+
+    public boolean canMove(int targetCol, int targetRow) {
+        if (isWithinBoard(targetCol, targetRow) == false) {
+            return false;
+        } 
+
+        if (Math.abs(targetCol - preCol) == Math.abs(targetRow - preRow) ||
+                (targetCol == preCol) || (targetRow == preRow)) {
+            return true;
+        }
+
+        return false;
+    }
 }
