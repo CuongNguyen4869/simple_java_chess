@@ -134,6 +134,12 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     private void simulate() {
+
+        try {
+            Thread.sleep(0, 1);
+        } catch (InterruptedException e) {
+            System.out.println("Thread was interrupted");
+        }
         
         canMove = false;
         validSquare = false;
