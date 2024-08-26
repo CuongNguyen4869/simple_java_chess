@@ -90,6 +90,65 @@ public class Piece {
         return false;
     }
 
+    public boolean isSameSquare(int targetCol, int targetRow) {
+        if (targetCol == preCol && targetRow == preRow) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isThereOtherPiecesOnTheWay(int targetCol, int targetRow) {
+        
+        if (targetRow == preRow){
+            // moving left
+            for (int c = preCol - 1; c > targetCol; c--) {
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.col == c && piece.row == targetRow) {
+                        // hittingP = piece;
+                        return true;
+                    }
+                }
+            }
+
+            // moving right
+            for (int c = preCol + 1; c < targetCol; c++) {
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.col == c && piece.row == targetRow) {
+                        // hittingP = piece;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        if (targetCol == preCol) {
+            // moving up
+            for (int r = preRow - 1; r > targetRow; r--){
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.row == r && piece.col == targetCol) {
+                        return true;
+                    }
+                }
+            }
+            // moving down
+            for (int r = preRow + 1; r < targetRow; r++){
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.row == r && piece.col == targetCol) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        if (Math.abs(targetCol - preCol) == Math.abs(targetRow - preRow)) {
+            // moving up left
+            // moving up right
+            // moving down left
+            // moving down right
+        }
+        return false;
+    }
+
     public Piece getHittingP(int targetCol, int targetRow) {
         for (Piece piece : GamePanel.simPieces) {
             // System.out.println("col " + piece.col + " row " + piece.row);
