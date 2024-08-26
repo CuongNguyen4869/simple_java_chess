@@ -15,13 +15,15 @@ public class Queen extends Piece {
     }
 
     public boolean canMove(int targetCol, int targetRow) {
-        if (isWithinBoard(targetCol, targetRow) == false) {
+        if (isWithinBoard(targetCol, targetRow) == false && isSameSquare(targetCol, targetRow)) {
             return false;
         } 
 
         if (Math.abs(targetCol - preCol) == Math.abs(targetRow - preRow) ||
                 (targetCol == preCol) || (targetRow == preRow)) {
-            return true;
+            if (isValidSquare(targetCol, targetRow) && isThereOtherPiecesOnTheWay(targetCol, targetRow) == false) {
+                return true;
+            }
         }
 
         return false;

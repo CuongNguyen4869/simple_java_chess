@@ -142,9 +142,37 @@ public class Piece {
 
         if (Math.abs(targetCol - preCol) == Math.abs(targetRow - preRow)) {
             // moving up left
+            for (int c = preCol - 1, r = preRow - 1; c > targetCol && r > targetRow; c--, r--) {
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.row == r && piece.col == c) {
+                        return true;
+                    }
+                }
+            }
             // moving up right
+            for (int c = preCol + 1, r = preRow - 1; c < targetCol && r > targetRow; c++, r--) {
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.row == r && piece.col == c) {
+                        return true;
+                    }
+                }
+            }
             // moving down left
+            for (int c = preCol - 1, r = preRow + 1; c > targetCol && r < targetRow; c--, r++) {
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.row == r && piece.col == c) {
+                        return true;
+                    }
+                }
+            }
             // moving down right
+            for (int c = preCol + 1, r = preRow + 1; c < targetCol && r < targetRow; c++, r++) {
+                for (Piece piece : GamePanel.simPieces) {
+                    if (piece.row == r && piece.col == c) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
