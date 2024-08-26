@@ -19,11 +19,11 @@ public class Knight extends Piece {
             return false;
         } 
 
-        if (((Math.abs(targetCol - preCol) == 1) && (Math.abs(targetRow - preRow) == 2)) || 
-                ((Math.abs(targetCol - preCol) == 2) && (Math.abs(targetRow - preRow) == 1))) {
-            return true;
+        if (Math.abs(targetCol - preCol) * Math.abs(targetRow - preRow) == 2) {
+            if (isValidSquare(targetCol, targetRow)){
+                return true;
+            }            
         }
-
         return false;
     }
 }
