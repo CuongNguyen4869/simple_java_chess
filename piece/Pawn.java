@@ -15,10 +15,37 @@ public class Pawn extends Piece {
     }
 
     public boolean canMove(int targetCol, int targetRow) {
-        if (isWithinBoard(targetCol, targetRow) == false) {
+        if (isWithinBoard(targetCol, targetRow) == false /* && isSameSquare(targetCol, targetRow) */) {
             return false;
-        } 
+        }
 
+        int moveValue;
+        if (color == GamePanel.WHITE) {
+            moveValue = -1;
+        } else {
+            moveValue = 1;
+        }
+
+        hittingP = getHittingP(targetCol, targetRow);
+
+        // 1 square movement
+        if (targetCol == preCol && targetRow == preRow + moveValue && hittingP == null) {
+            return true;
+        }
+
+        // 2 square movement
+        if (targetCol == preCol && targetRow == preRow + moveValue * 2 && hittingP == null && moved == false && 
+                isThereOtherPiecesOnTheWay(targetCol, targetRow) == false) {
+            return true;
+        }
+
+        // capture pieces
+        if (Math.abs(targetCol - preCol) == 1 && targetRow == preRow + moveValue 
+                && hittingP != null && hittingP.color != color) {
+            return true;
+        }
+
+        /*
         {
             if (color == GamePanel.WHITE) {
                 if (targetCol == preCol && (preRow - targetRow == 1 || (preRow == 6 && preRow - targetRow == 2))) {
@@ -31,6 +58,7 @@ public class Pawn extends Piece {
             }
 
         }
+        */
 
         return false;
     }
