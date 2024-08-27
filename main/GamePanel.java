@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -11,9 +12,10 @@ import piece.*;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 
 public class GamePanel extends JPanel implements Runnable{
-    public static final int WIDTH = 800;
+    public static final int WIDTH = 1100;
     public static final int HEIGHT = 800;
     final int FPS = 60;
     Thread gameThread;
@@ -94,6 +96,15 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
 
+    private void changePlayer() {
+        if (currentColor == WHITE) {
+            currentColor = BLACK;
+        } else {
+            currentColor = WHITE;
+        }
+        activeP = null;
+    }
+
     private void update() {
         
         // MOUSE PRESSED
@@ -124,6 +135,7 @@ public class GamePanel extends JPanel implements Runnable{
                     if (activeP.hittingP != null) {
                         simPieces.remove(activeP.hittingP.getIndex());
                     }
+                    changePlayer();
                 } else {
                     copyPieces(simPieces, pieces);
                     activeP.resetPosition();
@@ -192,6 +204,17 @@ public class GamePanel extends JPanel implements Runnable{
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
                 activeP.draw(g2);
             }           
+        }
+
+        // Turn message
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.setFont(new Font("Book Antique", Font.PLAIN, 40));
+        g2.setColor(Color.white);
+
+        if (currentColor == WHITE) {
+            g2.drawString("White's turn", 840, 550);
+        } else {
+            g2.drawString("Black's turn", 840, 250);
         }
     }
 
