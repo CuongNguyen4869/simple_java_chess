@@ -35,6 +35,7 @@ public class GamePanel extends JPanel implements Runnable{
     public static ArrayList<Piece> pieces = new ArrayList<>();      //backup for reset position
     public static ArrayList<Piece> simPieces = new ArrayList<>();   //current position?
     Piece activeP;
+    public static Piece castlingP;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -96,6 +97,17 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
 
+    private void checkCastling() {
+        if (castlingP != null) {
+            if (castlingP.col == 0) {
+                castlingP.col = 3;
+            } else {
+                castlingP.col = 5;
+            }
+            castlingP.x = castlingP.getX(castlingP.col);
+        }
+    }
+    
     private void changePlayer() {
         if (currentColor == WHITE) {
             currentColor = BLACK;
@@ -132,6 +144,11 @@ public class GamePanel extends JPanel implements Runnable{
                 if (validSquare) {
                     copyPieces(simPieces, pieces);
                     activeP.updatePosition();
+
+                    if (castlingP != null) {
+                        castlingP.updatePosition();
+                    }
+
                     if (activeP.hittingP != null) {
                         simPieces.remove(activeP.hittingP.getIndex());
                     }
@@ -158,6 +175,13 @@ public class GamePanel extends JPanel implements Runnable{
 
         // Restore the removed piece during the simulation
         copyPieces(simPieces, pieces);
+
+        // Reset the castling piece's position
+        if (castlingP != null) {
+            castlingP.col = castlingP.preCol;
+            castlingP.x = castlingP.getX(castlingP.col);
+            castlingP = null;
+        }
         
         // Held piece, update position
         activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
@@ -174,6 +198,9 @@ public class GamePanel extends JPanel implements Runnable{
 
         if (activeP.canMove(activeP.col, activeP.row)) {
             canMove = true;
+
+            checkCastling();
+
             validSquare = true;
 
             // if (activeP.hittingP != null) {

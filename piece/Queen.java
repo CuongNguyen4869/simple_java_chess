@@ -15,7 +15,7 @@ public class Queen extends Piece {
     }
 
     public boolean canMove(int targetCol, int targetRow) {
-        if (isWithinBoard(targetCol, targetRow) == false && isSameSquare(targetCol, targetRow)) {
+        if (isWithinBoard(targetCol, targetRow) == false || isSameSquare(targetCol, targetRow)) {
             return false;
         } 
 

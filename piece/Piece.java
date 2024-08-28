@@ -105,7 +105,7 @@ public class Piece {
             // moving left
             for (int c = preCol - 1; c > targetCol; c--) {
                 for (Piece piece : GamePanel.simPieces) {
-                    if (piece.col == c && piece.row == targetRow) {
+                    if (piece.col == c && piece.row == targetRow && piece !=  this) {
                         // hittingP = piece;
                         return true;
                     }
@@ -115,7 +115,7 @@ public class Piece {
             // moving right
             for (int c = preCol + 1; c < targetCol; c++) {
                 for (Piece piece : GamePanel.simPieces) {
-                    if (piece.col == c && piece.row == targetRow) {
+                    if (piece.col == c && piece.row == targetRow && piece !=  this) {
                         // hittingP = piece;
                         return true;
                     }
