@@ -111,8 +111,23 @@ public class GamePanel extends JPanel implements Runnable{
     private void changePlayer() {
         if (currentColor == WHITE) {
             currentColor = BLACK;
+
+            // Reset two stepped for en passant
+            for (Piece piece : pieces) {
+                if (piece.color == BLACK) {
+                    piece.twoStepped = false;
+                }
+            }
+
         } else {
             currentColor = WHITE;
+
+            // Reset two stepped for en passant
+            for (Piece piece : pieces) {
+                if (piece.color == WHITE) {
+                    piece.twoStepped = false;
+                }
+            }
         }
         activeP = null;
     }
@@ -188,13 +203,6 @@ public class GamePanel extends JPanel implements Runnable{
         activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
         activeP.col = activeP.getCol(activeP.x);
         activeP.row = activeP.getRow(activeP.y);
-
-        // System.out.println("mouse.x " + mouse.x +
-        //                     " mouse.y " + mouse.y +
-        //                     " activeP.x " + activeP.x +
-        //                     " activeP.y " + activeP.y +
-        //                     " activeP.col " + activeP.col +
-        //                     " activeP.row " + activeP.row);  
 
         if (activeP.canMove(activeP.col, activeP.row)) {
             canMove = true;
