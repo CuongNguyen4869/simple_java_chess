@@ -29,4 +29,15 @@ public class Knight extends Piece {
         }
         return false;
     }
+
+    public boolean doesGuard(int targetCol, int targetRow) {
+        if (isWithinBoard(targetCol, targetRow) == false) {
+            return false;
+        } 
+
+        if (Math.abs(targetCol - preCol) * Math.abs(targetRow - preRow) == 2) {
+            return true;          
+        }
+        return false;
+    }
 }

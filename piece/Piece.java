@@ -93,6 +93,10 @@ public class Piece {
     public boolean canMove(int targetCol, int targetRow) {
         return false;
     }
+
+    public boolean doesGuard(int targetCol, int targetRow) {
+        return false;
+    }
     
     public boolean isWithinBoard(int targetCol, int targetRow) {
         if (targetCol >= 0 && targetCol <= 7 && targetRow >= 0 && targetRow <= 7) {

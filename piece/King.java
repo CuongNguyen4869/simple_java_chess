@@ -59,4 +59,19 @@ public class King extends Piece {
 
         return false;
     }
+
+    public boolean doesGuard(int targetCol, int targetRow) {
+        if (isWithinBoard(targetCol, targetRow) == false) {
+            return false;
+        }
+        //if (Math.abs(targetCol - preCol) <= 1 && Math.abs(targetRow - preRow) <= 1) {
+
+        // Normal movement
+        if (Math.abs(targetCol - preCol) + Math.abs(targetRow - preRow) == 1 ||
+                Math.abs(targetCol - preCol) * Math.abs(targetRow - preRow) == 1) {
+            return true;         
+        }
+
+        return false;
+    }
 }

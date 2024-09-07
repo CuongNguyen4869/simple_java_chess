@@ -30,4 +30,18 @@ public class Rook extends Piece {
 
         return false;
     }
+
+    public boolean doesGuard(int targetCol, int targetRow) {
+        if (isWithinBoard(targetCol, targetRow) == false || isSameSquare(targetCol, targetRow)) {
+            return false;
+        } 
+
+        if ((targetCol == preCol) || (targetRow == preRow)) {
+            if (isThereOtherPiecesOnTheWay(targetCol, targetRow) == false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

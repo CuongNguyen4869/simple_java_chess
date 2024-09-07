@@ -60,4 +60,23 @@ public class Pawn extends Piece {
 
         return false;
     }
+
+    public boolean doesGuard(int targetCol, int targetRow) {
+        if (isWithinBoard(targetCol, targetRow) == false) {
+            return false;
+        }
+
+        int moveValue;
+        if (color == GamePanel.WHITE) {
+            moveValue = -1;
+        } else {
+            moveValue = 1;
+        }
+
+        // capture pieces
+        if (Math.abs(targetCol - preCol) == 1 && targetRow == preRow + moveValue) {
+            return true;
+        }
+        return false;
+    }
 }
