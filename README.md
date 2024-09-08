@@ -2,5 +2,4 @@
 Simple java chess game
 
 Next step:
-1. Detect checkmate
-2. Detect stalemate
+1. Detect stalemate

@@ -31,6 +31,9 @@ public class GamePanel extends JPanel implements Runnable{
     boolean canMove;
     boolean validSquare;
     boolean promotion;
+    boolean isKingInCheck = false;
+    int colorInCheck;
+    boolean gameOver = false;
 
     //PIECES
     public static ArrayList<Piece> pieces = new ArrayList<>();      //backup for reset position
@@ -112,11 +115,453 @@ public class GamePanel extends JPanel implements Runnable{
 
         for (Piece piece : simPieces) {
             if (piece.color != currentColor && piece.doesGuard(king.col, king.row)) {
-                if (piece.col == activeP.col && piece.row == activeP.row) continue;
+                if (activeP != null && piece.col == activeP.col && piece.row == activeP.row) continue;
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean isCheck() {
+        Piece king = null;
+        
+        for (Piece piece : pieces) {
+            if (piece.type == Type.KING && piece.color == currentColor) {
+                king = piece;
+                break;
+            }
+        }
+
+        for (Piece piece : simPieces) {
+            if (piece.color != currentColor && piece.canMove(king.col, king.row)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isCheckmate() {
+        for (Piece piece : pieces) {
+            if (piece.color == currentColor) {
+                int currentCol = piece.col;
+                int currentRow = piece.row;
+                switch (piece.type) {
+                    case KING:
+                    if (piece.canMove(piece.col -1, piece.row - 1)) {
+                        // update position
+                        piece.col = piece.col - 1;
+                        piece.row = piece.row - 1;
+                        // call isIllegal
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col - 1, piece.row + 1)) {
+                        piece.col = piece.col - 1;
+                        piece.row = piece.row + 1;
+                        
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 1, piece.row - 1)) {
+                        piece.col = piece.col + 1;
+                        piece.row = piece.row - 1;
+                        
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 1, piece.row + 1)) {
+                        piece.col = piece.col + 1;
+                        piece.row = piece.row + 1;
+                        
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col, piece.row - 1)) {
+                        // piece.col = piece.col - 1;
+                        piece.row = piece.row - 1;
+                        
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col, piece.row + 1)) {
+                        // piece.col = piece.col - 1;
+                        piece.row = piece.row + 1;
+                        
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col - 1, piece.row)) {
+                        piece.col = piece.col - 1;
+                        // piece.row = piece.row + 1;
+                        
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 1, piece.row)) {
+                        piece.col = piece.col + 1;
+                        // piece.row = piece.row + 1;
+                        
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    break;
+                    case QUEEN:
+                    for (int r = 0; r <= 8; r++) { // Vertical
+                        if (r == currentRow) continue;
+                        if (piece.canMove(piece.col, r)) {
+                            piece.row = r;
+                            
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int c = 0; c <= 8; c++ ) { // Horizontal
+                        if (c == currentCol) continue;
+                        if (piece.canMove(c, piece.col)) {
+                            piece.col = c;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int it = 1; currentCol + it <= 8 && currentRow + it <= 8; it++) { 
+                        if (piece.canMove(piece.col + it, piece.row + it)) {
+                            piece.col = piece.col + it;
+                            piece.row = piece.row + it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int it = 1; currentCol - it >= 0 && currentRow - it >= 0; it++) { 
+                        if (piece.canMove(piece.col - it, piece.row - it)) {
+                            piece.col = piece.col - it;
+                            piece.row = piece.row - it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int it = 1; currentCol + it <= 8 && currentRow - it >= 0; it++) {
+                        if (piece.canMove(piece.col + it, piece.row - it)) {
+                            piece.col = piece.col + it;
+                            piece.row = piece.row - it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int it = 1; currentCol - it >= 0 && currentRow + it <= 8; it++) {
+                        if (piece.canMove(piece.col - it, piece.row + it)) {
+                            piece.col = piece.col - it;
+                            piece.row = piece.row + it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    break;
+                    case BISHOP:
+                    for (int it = 1; currentCol + it <= 8 && currentRow + it <= 8; it++) { 
+                        if (piece.canMove(piece.col + it, piece.row + it)) {
+                            piece.col = piece.col + it;
+                            piece.row = piece.row + it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int it = 1; currentCol - it >= 0 && currentRow - it >= 0; it++) { 
+                        if (piece.canMove(piece.col - it, piece.row - it)) {
+                            piece.col = piece.col - it;
+                            piece.row = piece.row - it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int it = 1; currentCol + it <= 8 && currentRow - it >= 0; it++) {
+                        if (piece.canMove(piece.col + it, piece.row - it)) {
+                            piece.col = piece.col + it;
+                            piece.row = piece.row - it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int it = 1; currentCol - it >= 0 && currentRow + it <= 8; it++) {
+                        if (piece.canMove(piece.col - it, piece.row + it)) {
+                            piece.col = piece.col - it;
+                            piece.row = piece.row + it;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    break;
+                    case KNIGHT:
+                    if (piece.canMove(piece.col - 1, piece.row - 2)) {
+                        piece.col = piece.col - 1;
+                        piece.row = piece.row - 2;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col - 1, piece.row + 2)) {
+                        piece.col = piece.col - 1;
+                        piece.row = piece.row + 2;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 1, piece.row - 2)) {
+                        piece.col = piece.col + 1;
+                        piece.row = piece.row - 2;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 1, piece.row + 2)) {
+                        piece.col = piece.col + 1;
+                        piece.row = piece.row + 2;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col - 2, piece.row - 1)) {
+                        piece.col = piece.col - 2;
+                        piece.row = piece.row - 1;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col - 2, piece.row + 1)) {
+                        piece.col = piece.col - 2;
+                        piece.row = piece.row + 1;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 2, piece.row - 1)) {
+                        piece.col = piece.col + 2;
+                        piece.row = piece.row - 1;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 2, piece.row + 1)) {
+                        piece.col = piece.col + 2;
+                        piece.row = piece.row + 1;
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    break;
+                    case ROOK:
+                    for (int r = 0; r <= 8; r++) { // Vertical
+                        if (r == currentRow) continue;
+                        if (piece.canMove(piece.col, r)) {
+                            piece.row = r;
+                            
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    for (int c = 0; c <= 8; c++ ) { // Horizontal
+                        if (c == currentCol) continue;
+                        if (piece.canMove(c, piece.col)) {
+                            piece.col = c;
+
+                            if (isIllegal() == false) {
+                                piece.col = currentCol;
+                                piece.row = currentRow;
+                                return false;
+                            }
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                        }
+                    }
+                    break;
+                    case PAWN:
+                    int move = 0;
+                    if (piece.color == WHITE) {
+                        move = -1;
+                    } else {
+                        move = 1;
+                    }
+                    if (piece.canMove(piece.col, piece.row + move)) {
+                        // update position
+                        piece.col = piece.col;
+                        piece.row = piece.row + move;
+                        // call isIllegal
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col - 1, piece.row + move)) {
+                        // update position
+                        piece.col = piece.col - 1;
+                        piece.row = piece.row + move;
+                        // call isIllegal
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }
+                    if (piece.canMove(piece.col + 1, piece.row + move)) {
+                        // update position
+                        piece.col = piece.col + 1;
+                        piece.row = piece.row + move;
+                        // call isIllegal
+                        if (isIllegal() == false) {
+                            piece.col = currentCol;
+                            piece.row = currentRow;
+                            return false;
+                        }
+                        piece.col = currentCol;
+                        piece.row = currentRow;
+                    }                                        
+                    break;
+                    default: break;
+                }
+            }
+        }
+        
+        return true;
     }
 
     private void checkCastling() {
@@ -185,7 +630,15 @@ public class GamePanel extends JPanel implements Runnable{
     }
     
     private void update() {
-        
+
+        if (gameOver) return;
+
+        if (isCheck() && isCheckmate()) {
+            // System.out.println("Checkmate");
+            gameOver = true;
+            return;
+        }
+
         if (promotion) {
             promoting();
             return;
@@ -333,19 +786,35 @@ public class GamePanel extends JPanel implements Runnable{
         g2.setFont(new Font("Book Antique", Font.PLAIN, 40));
         g2.setColor(Color.white);
 
-        if (promotion) {
-            g2.drawString("Promote to:", 840, 150);
-            for (Piece piece : promoPieces) {
-                g2.drawImage(piece.image, piece.getX(piece.col), piece.getY(piece.row),
-                    Board.SQUARE_SIZE, Board.SQUARE_SIZE, null);
-            }
-        } else {
+        
+        
+        if (gameOver) {
+            String s = "";
             if (currentColor == WHITE) {
-                g2.drawString("White's turn", 840, 550);
-            } else {
-                g2.drawString("Black's turn", 840, 250);
+                s = "Black wins";
             }
-        }     
+            else {
+                s = "White wins";
+            }
+            g2.setFont(new Font("Arial", Font.PLAIN, 90));
+            g2.setColor(Color.green);
+            g2.drawString(s, 200, 420);
+        }
+        else {
+            if (promotion) {
+                g2.drawString("Promote to:", 840, 150);
+                for (Piece piece : promoPieces) {
+                    g2.drawImage(piece.image, piece.getX(piece.col), piece.getY(piece.row),
+                        Board.SQUARE_SIZE, Board.SQUARE_SIZE, null);
+                }
+            } else {
+                if (currentColor == WHITE) {
+                    g2.drawString("White's turn", 840, 550);
+                } else {
+                    g2.drawString("Black's turn", 840, 250);
+                }
+            }
+        }
     }
 
     @Override
