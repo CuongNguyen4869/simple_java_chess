@@ -34,6 +34,13 @@ public class King extends Piece {
 
         // Castling
         if (moved == false) {
+            for (Piece piece : GamePanel.simPieces) {
+                if (piece.color != color) {
+                    if (piece.doesGuard(preCol, preRow)) {
+                        return false;
+                    }
+                }
+            }
             // Right castling
             if (targetCol == preCol + 2 && targetRow == preRow && 
                     isThereOtherPiecesOnTheWay(targetCol + 1, targetRow) == false) {
