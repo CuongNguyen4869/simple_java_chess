@@ -34,6 +34,7 @@ public class GamePanel extends JPanel implements Runnable{
     boolean isKingInCheck = false;
     int colorInCheck;
     boolean gameOver = false;
+    boolean stalemate = false;
 
     //PIECES
     public static ArrayList<Piece> pieces = new ArrayList<>();      //backup for reset position
@@ -57,7 +58,7 @@ public class GamePanel extends JPanel implements Runnable{
         gameThread = new Thread(this);
         gameThread.start(); // calls run()
     }
-    
+
     public void setPieces() {
         //WHITE
         pieces.add(new Pawn(WHITE, 0, 6));
@@ -141,7 +142,7 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     private boolean isCheckmate() {
-        for (Piece piece : pieces) {
+        for (Piece piece : simPieces) {
             if (piece.color == currentColor) {
                 int currentCol = piece.col;
                 int currentRow = piece.row;
@@ -631,11 +632,15 @@ public class GamePanel extends JPanel implements Runnable{
     
     private void update() {
 
-        if (gameOver) return;
+        if (gameOver || stalemate) return;
 
-        if (isCheck() && isCheckmate()) {
+        if (isCheck() && activeP == null && isCheckmate()) {
             // System.out.println("Checkmate");
             gameOver = true;
+            return;
+        }
+        if (isCheck() == false && activeP == null && isCheckmate() == true) {
+            stalemate = true;
             return;
         }
 
@@ -799,6 +804,11 @@ public class GamePanel extends JPanel implements Runnable{
             g2.setFont(new Font("Arial", Font.PLAIN, 90));
             g2.setColor(Color.green);
             g2.drawString(s, 200, 420);
+        }
+        else if (stalemate) {
+            g2.setFont(new Font("Arial", Font.PLAIN, 90));
+            g2.setColor(Color.red);
+            g2.drawString("Stalemate", 200, 420);
         }
         else {
             if (promotion) {
